@@ -10,13 +10,20 @@ apk add --no-cache nginx curl
 
 echo "--- Configuring nginx ---"
 mkdir -p /var/www/html
-cat > /var/www/html/index.html <<'HTML'
+
+# Generate index.html at boot with the actual hostname
+cat > /etc/local.d/generate-index.start <<'SCRIPT'
+#!/bin/sh
+cat > /var/www/html/index.html <<EOF
 <!DOCTYPE html>
 <html>
 <head><title>CloudBuild Test</title></head>
-<body><h1>Build successful!</h1></body>
+<body><h1>Build successful!</h1><p>Hostname: $(hostname)</p></body>
 </html>
-HTML
+EOF
+SCRIPT
+chmod +x /etc/local.d/generate-index.start
+rc-update add local default
 
 # Configure nginx to serve /var/www/html
 cat > /etc/nginx/http.d/default.conf <<'NGINX'
