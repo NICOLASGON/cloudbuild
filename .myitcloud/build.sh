@@ -18,4 +18,7 @@ cat > /var/www/html/index.html <<'HTML'
 </html>
 HTML
 
+# Auto-start nginx on boot
+rc-update add nginx default
+
 echo "--- Build complete ---"
