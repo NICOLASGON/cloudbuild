@@ -18,6 +18,19 @@ cat > /var/www/html/index.html <<'HTML'
 </html>
 HTML
 
+# Configure nginx to serve /var/www/html
+cat > /etc/nginx/http.d/default.conf <<'NGINX'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html;
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+NGINX
+
 # Auto-start nginx on boot
 rc-update add nginx default
 
