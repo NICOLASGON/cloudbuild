@@ -15,7 +15,7 @@ mkdir -p /var/www/html
 cat > /etc/local.d/generate-index.start <<'SCRIPT'
 #!/bin/sh
 # Import environment variables from PID 1 (set by Incus)
-eval $(xargs -0 -n1 < /proc/1/environ 2>/dev/null | grep '^APP_VERSION=' | sed "s/'/'\\''/g;s/=\(.*\)/='\1'/")
+eval $(tr '\0' '\n' < /proc/1/environ 2>/dev/null | grep -E '^(APP_)' | sed "s/'/'\\''/g;s/=\(.*\)/='\1'/")
 cat > /var/www/html/index.html <<EOF
 <!DOCTYPE html>
 <html>
