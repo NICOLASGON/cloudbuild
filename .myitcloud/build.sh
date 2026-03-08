@@ -11,9 +11,11 @@ apk add --no-cache nginx curl
 echo "--- Configuring nginx ---"
 mkdir -p /var/www/html
 
-# Generate index.html at boot with the actual hostname
+# Generate index.html at boot with the actual hostname and env vars
 cat > /etc/local.d/generate-index.start <<'SCRIPT'
 #!/bin/sh
+# Import environment variables from PID 1 (set by Incus)
+eval $(xargs -0 -n1 < /proc/1/environ 2>/dev/null | grep '^APP_VERSION=' | sed "s/'/'\\''/g;s/=\(.*\)/='\1'/")
 cat > /var/www/html/index.html <<EOF
 <!DOCTYPE html>
 <html>
