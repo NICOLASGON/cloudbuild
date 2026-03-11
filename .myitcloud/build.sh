@@ -20,7 +20,7 @@ cat > /var/www/html/index.html <<EOF
 <!DOCTYPE html>
 <html>
 <head><title>CloudBuild Test</title></head>
-<body><h1>Build successful!</h1><p>Hostname: $(hostname)</p><p>App Version: $APP_VERSION</p></body>
+<body><h1>Build successful!</h1><p>Hostname: $(hostname)</p><p>App Version: $APP_VERSION</p><p>Environment: $APP_ENVIRONMENT</p></body>
 </html>
 EOF
 SCRIPT

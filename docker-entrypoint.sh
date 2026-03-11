@@ -17,6 +17,7 @@ cat > /usr/share/nginx/html/index.html <<EOF
     <h1>Build successful!</h1>
     <p class="info"><span class="label">Hostname:</span> $(hostname)</p>
     <p class="info"><span class="label">App Version:</span> ${APP_VERSION}</p>
+    <p class="info"><span class="label">Environment:</span> ${APP_ENVIRONMENT}</p>
   </div>
 </body>
 </html>
