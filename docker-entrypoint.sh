@@ -1,7 +1,4 @@
 #!/bin/sh
-# Import environment variables from PID 1 (Docker ENV)
-export $(cat /proc/1/environ | tr '\0' '\n' | grep -E '^APP_' | xargs)
-
 cat > /usr/share/nginx/html/index.html <<EOF
 <!DOCTYPE html>
 <html>
