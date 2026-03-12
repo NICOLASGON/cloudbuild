@@ -1,8 +1,19 @@
-FROM nginx:alpine
+FROM python:3.12-slim
 
-ENV APP_VERSION=1.0.0
+WORKDIR /app
 
-COPY docker-entrypoint.sh /docker-entrypoint.d/40-generate-index.sh
-RUN chmod +x /docker-entrypoint.d/40-generate-index.sh
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 80
+COPY app.py .
+COPY templates/ templates/
+
+ENV PGHOST=localhost
+ENV PGPORT=5432
+ENV PGDATABASE=cloudbuild
+ENV PGUSER=cloudbuild
+ENV PGPASSWORD=cloudbuild
+
+EXPOSE 8080
+
+CMD ["python", "app.py"]
