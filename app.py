@@ -1,6 +1,6 @@
 import os
 import socket
-from datetime import datetime
+import time
 
 import psycopg2
 from flask import Flask, render_template, request, redirect, url_for
@@ -81,5 +81,15 @@ def health():
 
 
 if __name__ == "__main__":
-    init_db()
+    for attempt in range(1, 16):
+        try:
+            init_db()
+            print("Database ready.")
+            break
+        except Exception as e:
+            print(f"DB not ready (attempt {attempt}/15): {e}")
+            time.sleep(2)
+    else:
+        print("Could not connect to database after 15 attempts, exiting.")
+        exit(1)
     app.run(host="0.0.0.0", port=8080)
