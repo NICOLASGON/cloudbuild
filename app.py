@@ -34,6 +34,10 @@ def with_db_retry(f):
                 print(f"DB connection lost in {f.__name__} (attempt {attempt}/{DB_RETRY_ATTEMPTS}): {e}")
                 if attempt < DB_RETRY_ATTEMPTS:
                     time.sleep(DB_RETRY_DELAY)
+            except psycopg2.errors.UndefinedTable:
+                print(f"Table missing in {f.__name__}, re-initializing schema...")
+                init_db()
+                return f(*args, **kwargs)
         raise last_err
     return wrapper
 
