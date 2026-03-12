@@ -1,3 +1,4 @@
+import functools
 import os
 import socket
 import time
@@ -6,6 +7,9 @@ import psycopg2
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
+
+DB_RETRY_ATTEMPTS = 5
+DB_RETRY_DELAY = 1
 
 
 def get_db():
@@ -16,6 +20,22 @@ def get_db():
         user=os.environ.get("PGUSER", "cloudbuild"),
         password=os.environ.get("PGPASSWORD", "cloudbuild"),
     )
+
+
+def with_db_retry(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        last_err = None
+        for attempt in range(1, DB_RETRY_ATTEMPTS + 1):
+            try:
+                return f(*args, **kwargs)
+            except psycopg2.OperationalError as e:
+                last_err = e
+                print(f"DB connection lost in {f.__name__} (attempt {attempt}/{DB_RETRY_ATTEMPTS}): {e}")
+                if attempt < DB_RETRY_ATTEMPTS:
+                    time.sleep(DB_RETRY_DELAY)
+        raise last_err
+    return wrapper
 
 
 def init_db():
@@ -35,6 +55,7 @@ def init_db():
 
 
 @app.route("/", methods=["GET", "POST"])
+@with_db_retry
 def index():
     if request.method == "POST":
         author = request.form.get("author", "").strip()
@@ -68,6 +89,7 @@ def index():
 
 
 @app.route("/health")
+@with_db_retry
 def health():
     try:
         conn = get_db()
